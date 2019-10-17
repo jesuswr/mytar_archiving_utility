@@ -1,0 +1,99 @@
+struct header{
+	int 		tamano del nombre;
+	tipo_raro 	modo;
+	tipo_raro 	uid;
+	tipo_raro 	gid;
+	string 		uname;
+	string 		gname;
+	int 		size;
+	int 		num_blocks;
+	tipo_raro 	link_flag;	
+	string	 	link_name;
+	char 		*name;
+}
+
+tar.c {
+
+	void writeAux(){
+	   hace write;
+	}
+
+	int_to_char(int x){
+		return arreglo de 4 caracteres que representan x;
+	}
+
+	cifrarString(char * str, int len){
+		FOR(char str[i] en str){
+			str[i] = rotarChar(str[i]);
+		}
+	}
+	
+	void get_header( header *h , int fd )
+	{
+		sacar vainas de stat
+	}
+
+	char * header_to_string(header * h){
+		hace el string
+		if(flag rota) rota el string
+		return a string con el contenido del header.
+	}
+
+	void empaquetar_dir(int fd, header *, char * ruta_padre){
+		writeAux(fd, header_to_string(h));
+
+		FOR(archivo (hijo) en el directorio){
+			header h;
+			get_header( &h , fd );
+			select_file_and_pack(&h, fd, "");
+		}
+	}
+
+	void empaquetar_gen(){
+		writeAux(fd, header_to_string(h));
+		conseguir fd2;
+		writeAux(fd, get_string_data(fd2));
+		close(fd2);
+	}
+
+	select_file_and_pack(header *h, int fd, char * papa_nombre){
+
+		if ( h is normal file )
+		{
+			empaquetar_file( fd , permisos, papa_nombre + "/", ...)
+		}
+		else if ( h is link symbolic && flag de archivos no regulares )
+		{
+			empaquetar_link( fd , permisos, papa_nombre + "/", ... )
+		}
+		else if ( h is a pipe && flag de archivos ...) {
+			empaquetar_pipe( fd , permisos, papa_nombre + "/", ... )
+		}
+		else if ( h is directory ) {
+			empaquetar_dir( fd, permisos , papa_nombre + "/" ,... )
+		}
+
+	}
+
+	void empaquetar( int fd1 , int fd2 )
+	{
+		
+		int fd;
+		fd = open( "nombre", crear | escribir | truncar "});
+		FOR(archivo en el input){
+			header h;
+			get_header( &h , fd );
+			select_file_and_pack(&h, fd, "");
+		}
+
+		close(fd);
+		
+	}
+}
+
+
+main.c {
+	
+	//
+
+}
