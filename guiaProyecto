@@ -91,6 +91,69 @@ tar.c {
 	}
 }
 
+untar.c
+{
+	descifrarString(char * str, int len){
+    	FOR(char str[i] en str){
+      		str[i] = rotarChar(str[i]);
+    	}
+  	}
+
+	read_header( int fd )
+	{
+		header h;
+		string s1 , s2;
+		leer las cosas que tienen tamano conocido y almacernarlo en h;
+		if ( descrifrado ) descifrarString( s1 , l1);
+		con el tamano del nombre ya leido leer el nombre y guardarlo en h;
+		if ( descrifrado ) descifrarString( s2 , l2);
+		return h;
+	}
+
+	descomprimir( int fd )
+	{
+		int fd;
+		header h;
+		while ( read != eof )
+		{
+			read_header( int fd );
+			if ( dir )
+			{
+				mkdir( ... );
+			}
+			if ( link )
+			{
+				symlink( ... );
+			}
+			if ( pipe )
+			{
+				mkfifo( ... );
+			}
+			if ( regular )
+			{
+				fd2 = open( ... , create | write );
+				loaddata( fd , fd2 , size );
+				close(fd2);
+			}
+		}
+	}
+
+	loaddata( int fd , int fd2 , int size )
+	{
+		int read_count = 0;
+		char buff[size];
+		while ( read_count < size )
+		{
+			int l2 = read( fd , buff , size );
+			read_count += l2;
+			int l1 = 0;
+			while ( l1 < l2 )
+			{
+				l1 += write( fd2 , buff + l1 , l2 - l1);
+			}
+		}
+	}
+}
 
 main.c {
 	
