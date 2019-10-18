@@ -14,15 +14,15 @@ struct header{
 
 tar.c {
 
-	void writeAux(){
+	void writeAux(){ //ready
 	   hace write;
 	}
 
-	int_to_char(int x){
+	int_to_char(int x){ //ready
 		return arreglo de 4 caracteres que representan x;
 	}
 
-	cifrarString(char * str, int len){
+	cifrarString(char * str, int len){ //ready
 		FOR(char str[i] en str){
 			str[i] = rotarChar(str[i]);
 		}
