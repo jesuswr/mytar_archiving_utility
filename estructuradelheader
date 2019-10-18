@@ -1,0 +1,27 @@
+struct header{
+	int 		tamano del nombre;
+	char		tipo de archivo
+	int			modo;
+	tipo_raro 	uid;
+	tipo_raro 	gid;
+	int 		size;
+	int 		num_blocks;
+	tipo_raro 	link_flag;		???
+	string	 	link_name;
+	char 		*name;
+}
+
+
+
+modo:
+	Solo se usan los ultimos 12 bits:
+		3		3		3		3
+		Set Uid		Permisos	Permisos	Permisos
+		Set gid 	de usuario	de grupo	de otros
+		Sticky bit
+
+Tipos de archivos:
+	d - directorios		S_IFDIR
+	l - links		S_IFLNK
+	p - pipes		S_IFIFO
+	r - regulares		S_IFREG
