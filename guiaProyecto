@@ -28,12 +28,12 @@ tar.c {
 		}
 	}
 	
-	void get_header( header *h , int fd )
+	void get_header( header *h , int fd ) // listo, cambiamos la firma
 	{
 		sacar vainas de stat
 	}
 
-	char * header_to_string(header * h){
+	char * header_to_string(header * h){ // listo
 		hace el string
 		if(flag rota) rota el string
 		return a string con el contenido del header.
