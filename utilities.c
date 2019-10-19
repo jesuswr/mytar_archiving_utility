@@ -27,12 +27,12 @@ char rotar_char(char a, int desp){
 
 void cifrar_string(char * s, int len, int desp){
 	int i;
-	for(i=0; i<len; i++) s[i] = rotar_char(s[i], desp);
+	for(i=0; i<len; i++) s[i] = rotar_char(s[i], desp%8);
 }
 
 void descifrar_string(char * s, int len, int desp){
 	int i;
-	for(i=0; i<len; i++) s[i] = rotar_char(s[i], 8-desp);
+	for(i=0; i<len; i++) s[i] = rotar_char(s[i], 8-(desp%8));
 }
 
 char* make_path( char* path , char* name )
