@@ -39,40 +39,25 @@ tar.c {
 		return a string con el contenido del header.
 	}
 
-	void empaquetar_dir(int fd, header *, char * ruta_padre){
-		writeAux(fd, header_to_string(h));
-
-		FOR(archivo (hijo) en el directorio){
-			header h;
-			get_header( &h , fd );
-			select_file_and_pack(&h, fd, "");
-		}
-	}
-
-	void empaquetar_gen(){
-		writeAux(fd, header_to_string(h));
+	void guardar_data(int fd, char * ruta){
 		conseguir fd2;
 		writeAux(fd, get_string_data(fd2));
 		close(fd2);
 	}
 
-	select_file_and_pack(header *h, int fd, char * papa_nombre){
+	void guardar_header(header * h, int fd){
+		write_aux(fd, tamano_string_header, header_to_string(h));
+	}
 
-		if ( h is normal file )
-		{
-			empaquetar_file( fd , permisos, papa_nombre + "/", ...)
-		}
-		else if ( h is link symbolic && flag de archivos no regulares )
-		{
-			empaquetar_link( fd , permisos, papa_nombre + "/", ... )
-		}
-		else if ( h is a pipe && flag de archivos ...) {
-			empaquetar_pipe( fd , permisos, papa_nombre + "/", ... )
-		}
-		else if ( h is directory ) {
-			empaquetar_dir( fd, permisos , papa_nombre + "/" ,... )
-		}
+	void empaquetar_dir(int fd, header *, char * ruta){
 
+		FOR(archivo (hijo) en el directorio){
+			header h;
+			get_header( &h , fd );
+			guardar_header(&h, ruta / nombrehijo);
+			if(es dir) empaquetar_dir(fd, &h, ruta / nombrehijo)
+			else if(es reg) guardar_data(fd, ruta / nombrehijo)
+		}
 	}
 
 	void empaquetar( int fd1 , int fd2 )
@@ -83,7 +68,9 @@ tar.c {
 		FOR(archivo en el input){
 			header h;
 			get_header( &h , fd );
-			select_file_and_pack(&h, fd, "");
+			guardar_header(&h, nombreArchivo);
+			if(es dir) empaquetar_dir(fd, &h, nombreArchivo)
+			else if(es reg) guardar_data(fd, nombreArchivo)
 		}
 
 		close(fd);
