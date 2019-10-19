@@ -93,7 +93,7 @@ tar.c {
 
 untar.c
 {
-	descifrarString(char * str, int len){
+	descifrarString(char * str, int len){ // listoo
     	FOR(char str[i] en str){
       		str[i] = rotarChar(str[i]);
     	}
