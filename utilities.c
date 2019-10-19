@@ -1,5 +1,7 @@
 #include "tar.h"
 #include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 
 
 void int_to_char(int x, char * ret){
@@ -31,4 +33,20 @@ void cifrar_string(char * s, int len, int desp){
 void descifrar_string(char * s, int len, int desp){
 	int i;
 	for(i=0; i<len; i++) s[i] = rotar_char(s[i], 8-desp);
+}
+
+char* make_path( char* path , char* name )
+{
+	char *ret = (char *)malloc( strlen(path) + strlen(name) + 1);
+	if ( strlen(path) == 0 )
+	{
+		strcpy( ret , name );	
+	}
+	else
+	{
+		strcpy( ret , path );
+		ret[strlen(path)] = '/';
+		strcat( ret, name);
+	}
+	return ret;
 }

@@ -11,7 +11,7 @@ void cifrar_string(char * s, int len, int desp);
 
 void descifrar_string(char * s, int len, int desp);
 
-
+char* make_path( char* path , char* name );
 
 
 #endif

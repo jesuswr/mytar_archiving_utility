@@ -49,7 +49,6 @@ int get_header( char* path_and_name , header *h ){
 }
 
 char * header_to_string(header * h){
-	//
 	char * ret = NULL;
 	int size = 28;
 	size += h->name_size;
@@ -66,4 +65,8 @@ char * header_to_string(header * h){
 	if ( h->link_size > 0 ) sprintf((ret + 28 + h->name_size), "%s", h->link_path);
 
 	return ret;
+}
+
+void store_header(header * h, int fd){
+	write_aux(fd, 28 + h->name_size + h->link_size, header_to_string(h));
 }
