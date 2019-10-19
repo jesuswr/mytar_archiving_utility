@@ -41,6 +41,10 @@ int get_header( char* path_and_name , header *h ){
 		h->link_path = c2;
 		free(c);
 	}
+	else
+	{
+		h->link_size = 0;
+	}
 	return 0;
 }
 
@@ -59,7 +63,7 @@ char * header_to_string(header * h){
 	int_to_char(h->name_size, (ret + 20));
 	int_to_char(h->link_size, (ret + 24));
 	sprintf((ret + 28), "%s", h->name);
-	sprintf((ret + 28 + h->name_size), "%s", h->link_path);
+	if ( h->link_size > 0 ) sprintf((ret + 28 + h->name_size), "%s", h->link_path);
 
 	return ret;
 }
