@@ -33,6 +33,6 @@ int main(){
 	fd = open("mytar", O_RDWR |  O_CREAT |  O_TRUNC);
 	store_header( &h, fd);
 
-	pack_dir(fd, &h, "carpetica");
+	pack_dir(fd, "carpetica");
 
 }
