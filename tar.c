@@ -70,3 +70,18 @@ char * header_to_string(header * h){
 void store_header(header * h, int fd){
 	write_aux(fd, 28 + h->name_size + h->link_size, header_to_string(h));
 }
+
+int save_data( int fd , char* path )
+{
+	int a, l;
+	char buff[400];
+
+	a = open( path , O_RDONLY );
+	l = 1;
+
+	while( l > 0 )
+	{
+		l = read( a , buff , 400 );
+		write_aux( fd , l , buff );
+	}
+}

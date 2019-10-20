@@ -39,13 +39,13 @@ tar.c {
 		return a string con el contenido del header.
 	}
 
-	void guardar_data(int fd, char * ruta){
+	void guardar_data(int fd, char * ruta){ // listo
 		conseguir fd2;
 		writeAux(fd, get_string_data(fd2));
 		close(fd2);
 	}
 
-	void guardar_header(header * h, int fd){
+	void guardar_header(header * h, int fd){	// listo
 		write_aux(fd, tamano_string_header, header_to_string(h));
 	}
 
