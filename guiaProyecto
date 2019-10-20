@@ -28,7 +28,7 @@ tar.c {
 		}
 	}
 	
-	void get_header( header *h , int fd ) // listo, cambiamos la firma
+	void get_header(char * path_and_name,  header *h) // listo
 	{
 		sacar vainas de stat
 	}
@@ -53,7 +53,7 @@ tar.c {
 
 		FOR(archivo (hijo) en el directorio){
 			header h;
-			get_header( &h , fd );
+			get_header(ruta / nombrehijo,  &h );
 			guardar_header(&h, ruta / nombrehijo);
 			if(es dir) empaquetar_dir(fd, &h, ruta / nombrehijo)
 			else if(es reg) guardar_data(fd, ruta / nombrehijo)
