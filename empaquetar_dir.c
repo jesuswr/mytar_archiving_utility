@@ -7,9 +7,10 @@
 #include <fcntl.h>
 #include "tar.h"
 #include "utilities.h"
+#include <dirent.h>
 
 
-void pack_dir(int fd, header *, char * ruta){
+void pack_dir(int fd, char * ruta){
 	
 	DIR* dirp;
 	struct dirent* de;
@@ -17,10 +18,10 @@ void pack_dir(int fd, header *, char * ruta){
 
 	dirp = opendir( ruta );
 	while( de = readdir( dirp ) ){
-		get_header( make_path(ruta, (de->name)), &h);
+		get_header( make_path(ruta, (de->d_name)), &h);
 		store_header( &h, fd);
-		if( (de->type & S_ISDIR) == S_ISDIR) pack_dir(fd, &h, make_path(ruta, (de->name)) );
-		if( (de->type & S_ISREG) == S_ISREG) save_data(fd, make_path(ruta, (de->name)));
+		if( (de->d_type & __S_ISDIR) == __S_ISDIR) pack_dir(fd, &h, make_path(ruta, (de->d_name)) );
+		if( (de->d_type & __S_ISREG) == __S_ISREG) save_data(fd, make_path(ruta, (de->d_name)));
 		/*printf("%s %u\n",de->d_name ,de->d_type);*/
 	}
 }
