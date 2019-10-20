@@ -21,5 +21,8 @@ void store_header(header * h, int fd);
 
 int save_data( int fd , char* path );
 
+int pack( char** argv , int argc );
+
+void pack_dir(int fd, char * ruta);
 
 #endif

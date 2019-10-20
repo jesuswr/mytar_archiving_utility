@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include "tar.h"
 #include "utilities.h"
 
@@ -84,4 +85,35 @@ int save_data( int fd , char* path )
 		l = read( a , buff , 400 );
 		write_aux( fd , l , buff );
 	}
+}
+
+int pack( char** argv , int argc )
+{
+	int fd;
+	header h;
+	int i;
+
+	fd = open ( argv[1] , O_RDWR | O_CREAT | O_TRUNC , S_IRWXU | S_IRWXG | S_IROTH );
+	for ( i = 2 ; i < argc ; i ++)
+	{
+		get_header( argv[i] , &h );
+		store_header( &h , fd );
+		if ( ( h.modo & __S_IFMT ) == __S_IFDIR ) pack_dir( fd , argv[i] );
+		if ( ( h.modo & __S_IFMT ) == __S_IFREG ) save_data( fd , argv[i] );
+	}
+}
+
+void pack_dir(int fd, char * ruta){
+  
+  DIR* dirp;
+  struct dirent* de;
+  header h;
+
+  dirp = opendir( ruta );
+  while( de = readdir( dirp ) ){
+    get_header( make_path(ruta, (de->d_name)), &h);
+    store_header( &h, fd);
+    if( (de->d_type & __S_IFDIR) == __S_IFDIR) pack_dir(fd, make_path(ruta, (de->d_name)) );
+    if( (de->d_type & __S_IFREG) == __S_IFREG) save_data(fd, make_path(ruta, (de->d_name)));
+  }
 }
