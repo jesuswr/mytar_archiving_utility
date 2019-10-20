@@ -19,5 +19,7 @@ char * header_to_string(header * h);
 
 void store_header(header * h, int fd);
 
+int save_data( int fd , char* path );
+
 
 #endif
