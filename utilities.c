@@ -50,3 +50,26 @@ char* make_path( char* path , char* name )
 	}
 	return ret;
 }
+
+int leer_aux( int fd , char* buf , int l )
+{
+	int l2;
+	l2 = 0;
+	while ( l2 < l )
+	{
+		l2 = l2 + read( fd , buf + l2 , l - l2 );
+	}
+	return 0;
+}
+
+int str_to_int( char* c  )
+{
+	int x, i;
+	x = 0;
+	for( i = 3 ; i >= 0 ; i-- )
+	{
+		x = x << 8;
+		x = x | c[i];
+	}
+	return x;
+}
