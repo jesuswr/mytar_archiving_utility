@@ -11,6 +11,7 @@
 
 
 int get_header( char* path_and_name , header *h ){
+	
 	struct stat sb;
 	int x, y, l;
 	char * c;
@@ -30,8 +31,8 @@ int get_header( char* path_and_name , header *h ){
 
 	h->name = c;
 
-	if ( ( sb.st_mode & __S_IFMT ) == __S_IFLNK )
-	{	
+	if ( ( sb.st_mode & __S_IFMT ) == __S_IFLNK ){	
+		
 		c = ( char * )malloc(400);
 		l = 0;
 		l += readlink( path_and_name , c , 399 );
@@ -41,66 +42,78 @@ int get_header( char* path_and_name , header *h ){
 		h->link_size = l;
 		h->link_path = c2;
 		free(c);
-	}
-	else
-	{
+	
+	}else{
+	
 		h->link_size = 0;
+	
 	}
+
 	return 0;
 }
 
 char * header_to_string(header * h){
+	
 	char * ret = NULL;
-	int size = 28;
+	char * aux = NULL;
+	int size = 29;
+
 	size += h->name_size;
 	size += h->link_size;
+
 	ret = (char*) malloc(sizeof(char)*size);
-	int_to_char(h->modo, ret);
-	int_to_char(h->uid, (ret + 4));
-	int_to_char(h->gid, (ret + 8));
-	int_to_char(h->size, (ret + 12));
-	int_to_char(h->num_blocks, (ret + 16));
-	int_to_char(h->name_size, (ret + 20));
-	int_to_char(h->link_size, (ret + 24));
-	sprintf((ret + 28), "%s", h->name);
-	if ( h->link_size > 0 ) sprintf((ret + 28 + h->name_size), "%s", h->link_path);
+	aux = ret + 1;
+
+	ret[0] = 68;
+	int_to_char(h->modo, aux);
+	int_to_char(h->uid, (aux + 4));
+	int_to_char(h->gid, (aux + 8));
+	int_to_char(h->size, (aux + 12));
+	int_to_char(h->num_blocks, (aux + 16));
+	int_to_char(h->name_size, (aux + 20));
+	int_to_char(h->link_size, (aux + 24));
+	sprintf((aux + 28), "%s", h->name);
+	if ( h->link_size > 0 ) sprintf((aux + 28 + h->name_size), "%s", h->link_path);
 
 	return ret;
 }
 
 void store_header(header * h, int fd){
-	write_aux(fd, 28 + h->name_size + h->link_size, header_to_string(h));
+	write_aux(fd, 29 + h->name_size + h->link_size, header_to_string(h));
 }
 
-int save_data( int fd , char* path )
-{
+int save_data( int fd , char* path ){
+	
 	int a, l;
 	char buff[400];
 
 	a = open( path , O_RDONLY );
 	l = 1;
 
-	while( l > 0 )
-	{
+	while( l > 0 ){
+
 		l = read( a , buff , 400 );
 		write_aux( fd , l , buff );
 	}
 }
 
-int pack( char** argv , int argc )
-{
+int pack( char** argv , int argc ){
+	
 	int fd;
 	header h;
 	int i;
 
 	fd = open ( argv[1] , O_RDWR | O_CREAT | O_TRUNC , S_IRWXU | S_IRWXG | S_IROTH );
-	for ( i = 2 ; i < argc ; i ++)
-	{
+
+	for ( i = 2 ; i < argc ; i ++){
+
 		get_header( argv[i] , &h );
 		store_header( &h , fd );
+		if ( ( h.modo & __S_IFMT ) == __S_IFLNK) continue;
 		if ( ( h.modo & __S_IFMT ) == __S_IFDIR ) pack_dir( fd , argv[i] );
 		if ( ( h.modo & __S_IFMT ) == __S_IFREG ) save_data( fd , argv[i] );
 	}
+	
 }
 
 void pack_dir(int fd, char * ruta){
@@ -111,9 +124,17 @@ void pack_dir(int fd, char * ruta){
 
   dirp = opendir( ruta );
   while( de = readdir( dirp ) ){
+    
     get_header( make_path(ruta, (de->d_name)), &h);
+    
+    if(strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0 ) continue;
+    
     store_header( &h, fd);
-    if( (de->d_type & __S_IFDIR) == __S_IFDIR) pack_dir(fd, make_path(ruta, (de->d_name)) );
-    if( (de->d_type & __S_IFREG) == __S_IFREG) save_data(fd, make_path(ruta, (de->d_name)));
+
+    if(( h.modo & __S_IFMT ) == __S_IFLNK) continue;
+    if( (h.modo & __S_IFDIR) == __S_IFDIR) pack_dir(fd, make_path(ruta, (de->d_name)) );
+    if( (h.modo & __S_IFREG) == __S_IFREG) save_data(fd, make_path(ruta, (de->d_name)));
+    	
   }
+
 }
