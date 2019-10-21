@@ -13,5 +13,8 @@ void descifrar_string(char * s, int len, int desp);
 
 char* make_path( char* path , char* name );
 
+int leer_aux( int fd , char* buf , int l );
+
+int str_to_int( char* c  );
 
 #endif
