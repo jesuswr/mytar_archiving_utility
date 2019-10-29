@@ -13,6 +13,8 @@ typedef struct {
 	char* link_path;
 } header;
 
+int loaddata(int fd1 , int fd2 , int size);
+
 int get_header( char* path_and_name , header *h );
 
 int read_header( int fd , header* h );

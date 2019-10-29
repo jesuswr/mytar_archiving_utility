@@ -9,6 +9,12 @@
 #include "tar.h"
 #include "utilities.h"
 
+int loaddata(int fd1 , int fd2 , int size){
+	char *buff;
+	buff = (char*)malloc(size);
+	leer_aux(fd1, buff, size);
+	write_aux(fd2, size, buff);
+}
 
 int get_header( char* path_and_name , header *h ){
 	
