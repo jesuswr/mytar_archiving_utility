@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 
-void int_to_char(int x, char * ret){
+void int_to_char(int x, unsigned char * ret){
 	int i;
 	for(i=0; i<4; i++){
 		ret[i] = (x)&255;
@@ -12,32 +12,32 @@ void int_to_char(int x, char * ret){
 	}
 }
 
-void write_aux(int fd, int len, char * buf){
+void write_aux(int fd, int len, unsigned char * buf){
 	int len2 = 0;
 	while(len2 < len){
 		len2 += write(fd, buf + len2, len-len2);
 	}
 }
 
-char rotar_char(char a, int desp){
+unsigned char rotar_char(unsigned char a, int desp){
 	int i;
 	a = ( a << desp ) | ( a >> 8 - desp );
 	return a;
 }
 
-void cifrar_string(char * s, int len, int desp){
+void cifrar_string(unsigned char * s, int len, int desp){
 	int i;
 	for(i=0; i<len; i++) s[i] = rotar_char(s[i], desp%8);
 }
 
-void descifrar_string(char * s, int len, int desp){
+void descifrar_string(unsigned char * s, int len, int desp){
 	int i;
 	for(i=0; i<len; i++) s[i] = rotar_char(s[i], 8-(desp%8));
 }
 
-char* make_path( char* path , char* name )
+unsigned char* make_path( unsigned char* path , unsigned char* name )
 {
-	char *ret = (char *)malloc( strlen(path) + strlen(name) + 1);
+	unsigned char *ret = (unsigned char *)malloc( strlen(path) + strlen(name) + 1);
 	if ( strlen(path) == 0 )
 	{
 		strcpy( ret , name );	
@@ -51,7 +51,7 @@ char* make_path( char* path , char* name )
 	return ret;
 }
 
-int leer_aux( int fd , char* buf , int l )
+int leer_aux( int fd , unsigned char* buf , int l )
 {
 	int l2;
 	l2 = 0;
@@ -62,7 +62,7 @@ int leer_aux( int fd , char* buf , int l )
 	return 0;
 }
 
-int str_to_int( char* c  )
+int str_to_int( unsigned char* c  )
 {
 	int x, i;
 	x = 0;
