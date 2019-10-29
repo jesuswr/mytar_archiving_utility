@@ -153,6 +153,7 @@ int pack( char** argv , int argc ){
 	for ( i = 2 ; i < argc ; i ++){
 
 		get_header( argv[i] , &h );
+		printf("%d\n" , h.modo);
 		store_header( &h , fd );
 		if ( ( h.modo & __S_IFMT ) == __S_IFLNK) continue;
 		if ( ( h.modo & __S_IFMT ) == __S_IFDIR ) pack_dir( fd , argv[i] );
