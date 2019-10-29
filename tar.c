@@ -52,6 +52,45 @@ int get_header( char* path_and_name , header *h ){
 	return 0;
 }
 
+int read_header( int fd , header* h ){
+	/* RECORDAR LEER LA CASILLA LIBRE ANTES DE LLAMAR LA FUNCION */
+	char buf[4];
+	char *buf2, *buf3;
+	int e;
+
+	e = leer_aux( fd , buf , 4 );
+	h->modo = str_to_int( buf );
+
+	e = leer_aux( fd , buf , 4 );
+	h->uid = str_to_int( buf );
+
+	e = leer_aux( fd , buf , 4 );
+	h->gid = str_to_int( buf );
+	
+	e = leer_aux( fd , buf , 4 );
+	h->size = str_to_int( buf );
+
+	e = leer_aux( fd , buf , 4 );
+	h->num_blocks = str_to_int( buf );
+
+	e = leer_aux( fd , buf , 4 );
+	h->name_size = str_to_int( buf );
+
+	e = leer_aux( fd , buf , 4 );
+	h->link_size = str_to_int( buf );
+
+	buf2 = (char*)malloc( h->size );
+	e = leer_aux( fd , buf2 , h->name_size );
+	h->name = buf2;
+	if( h->link_size > 0 ){
+		buf3 = (char*)malloc( h->link_size );
+		e = leer_aux( fd , buf3 , h->link_size);
+		h->link_path = buf3;
+	}
+	return 0;
+}
+
+
 char * header_to_string(header * h){
 	
 	char * ret = NULL;

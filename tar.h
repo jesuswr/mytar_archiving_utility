@@ -15,6 +15,8 @@ typedef struct {
 
 int get_header( char* path_and_name , header *h );
 
+int read_header( int fd , header* h );
+
 char * header_to_string(header * h);
 
 void store_header(header * h, int fd);
