@@ -85,7 +85,9 @@ int read_header( int fd , header* h ){
 	e = leer_aux( fd , buf , 4 );
 	h->link_size = str_to_int( buf );
 
-	buf2 = (unsigned char*)malloc( h->size );
+
+	buf2 = (unsigned char*)malloc( h->name_size );
+
 	e = leer_aux( fd , buf2 , h->name_size );
 	h->name = buf2;
 	if( h->link_size > 0 ){
