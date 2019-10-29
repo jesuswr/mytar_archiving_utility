@@ -9,7 +9,7 @@
 #include "tar.h"
 #include "utilities.h"
 
-int leer_aux( int fd , char* buf , int l )
+int leer_aux( int fd , unsigned char* buf , int l )
 {
 	int l2;
 	l2 = 0;
@@ -20,7 +20,7 @@ int leer_aux( int fd , char* buf , int l )
 	return 0;
 }
 
-int str_to_int( char* c  )
+int str_to_int(unsigned char* c  )
 {
 	int x, i;
 	x = 0;
@@ -32,7 +32,15 @@ int str_to_int( char* c  )
 	return x;
 }
 
-void write_aux(int fd, int len, char * buf){
+void int_to_char(int x, unsigned char * ret){
+	int i;
+	for(i=0; i<4; i++){
+		ret[i] = (x)&255;
+		x >>= 8;
+	}
+}
+
+void write_aux(int fd, int len, unsigned char * buf){
 	int len2 = 0;
 	while(len2 < len){
 		len2 += write(fd, buf + len2, len-len2);
@@ -41,27 +49,20 @@ void write_aux(int fd, int len, char * buf){
 
 
 int loaddata(int fd1 , int fd2 , int size){
-
-	printf("qlqmano in\n");
-	
-	int read_count = 0;
-	char * buff = (char*) malloc(sizeof(char)*size);
-
+	unsigned char *buff;
+	buff = (unsigned char*)malloc(size);
 	leer_aux(fd1, buff, size);
 	write_aux(fd2, size, buff);
-	
 	free(buff);
-
-	printf("qlqmano out\n");
 }
 
 int read_header( int fd , header* h ){
 	/* RECORDAR LEER LA CASILLA LIBRE ANTES DE LLAMAR LA FUNCION */
-	char buf[4];
-	char *buf2, *buf3;
-	int e;
+	
 
-	printf("jeje\n");
+	unsigned char buf[4];
+	unsigned char *buf2, *buf3;
+	int e;
 
 	e = leer_aux( fd , buf , 4 );
 	h->modo = str_to_int( buf );
@@ -84,37 +85,34 @@ int read_header( int fd , header* h ){
 	e = leer_aux( fd , buf , 4 );
 	h->link_size = str_to_int( buf );
 
-	buf2 = (char*)malloc( h->size );
+	buf2 = (unsigned char*)malloc( h->name_size );
 	e = leer_aux( fd , buf2 , h->name_size );
+
 	h->name = buf2;
 	if( h->link_size > 0 ){
-		buf3 = (char*)malloc( h->link_size );
+		buf3 = (unsigned char*)malloc( h->link_size );
 		e = leer_aux( fd , buf3 , h->link_size);
 		h->link_path = buf3;
 	}
 
-	printf("jojo\n");
-
 	return 0;
 }
 
-int unpack( char * packed_file){
+int unpack( unsigned char * packed_file){
 	
 	int fd, fd2;
 	header h;
-	char buf;
+	unsigned char buf;
 
 	fd = open(packed_file, O_RDWR);
 
 	while ( read(fd , &buf, 1)==1 && (buf=='D' || buf=='C') ){
 
-		printf("aiuda\n");
 
 		read_header(fd, &h);
 
-		printf("ooooo\n");
 
-		if ( (h.modo & __S_IFDIR) == __S_IFDIR ){
+		if ( (h.modo & __S_IFMT) == __S_IFDIR ){
 			mkdir(h.name, h.modo);
 		}
 		if ( (h.modo & __S_IFMT ) == __S_IFLNK ){
@@ -123,8 +121,8 @@ int unpack( char * packed_file){
 		if ( ( h.modo & __S_IFMT ) == __S_IFIFO ){
 			mkfifo(h.name, h.modo);
 		}
-		if ( (h.modo & __S_IFREG) == __S_IFREG ){
-			fd2 = open( h.name , O_RDWR | O_CREAT | O_TRUNC, h.modo );
+		if ( (h.modo & __S_IFMT) == __S_IFREG ){
+			fd2 = open( h.name , O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IROTH );
 			loaddata( fd , fd2 , h.size);
 			close(fd2);
 		}
@@ -134,7 +132,8 @@ int unpack( char * packed_file){
 }
 
 
-
 int main(){
+
 	unpack("mytar");
+
 }

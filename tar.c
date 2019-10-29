@@ -7,21 +7,21 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include "tar.h"
-#include "utilities.h"
+#include "utilities.h" 
 
 int loaddata(int fd1 , int fd2 , int size){
-	char *buff;
-	buff = (char*)malloc(size);
+	unsigned char *buff;
+	buff = (unsigned char*)malloc(size);
 	leer_aux(fd1, buff, size);
 	write_aux(fd2, size, buff);
 }
 
-int get_header( char* path_and_name , header *h ){
+int get_header( unsigned char* path_and_name , header *h ){
 	
 	struct stat sb;
 	int x, y, l;
-	char * c;
-	char * c2;
+	unsigned char * c;
+	unsigned char * c2;
 
 	x = lstat( path_and_name , &sb );
 
@@ -32,18 +32,18 @@ int get_header( char* path_and_name , header *h ){
 	h->num_blocks = sb.st_blocks;
 	h->name_size = strlen( path_and_name );
 
-	c = ( char * )malloc( h->name_size );
+	c = ( unsigned char * )malloc( h->name_size );
 	strcpy( c , path_and_name );
 
 	h->name = c;
 
 	if ( ( sb.st_mode & __S_IFMT ) == __S_IFLNK ){	
 		
-		c = ( char * )malloc(400);
+		c = ( unsigned char * )malloc(400);
 		l = 0;
 		l += readlink( path_and_name , c , 399 );
 		c[l] = '\0';
-		c2 = ( char * )malloc( strlen(c) );
+		c2 = ( unsigned char * )malloc( strlen(c) );
 		strcpy(c2,c);
 		h->link_size = l;
 		h->link_path = c2;
@@ -60,8 +60,8 @@ int get_header( char* path_and_name , header *h ){
 
 int read_header( int fd , header* h ){
 	/* RECORDAR LEER LA CASILLA LIBRE ANTES DE LLAMAR LA FUNCION */
-	char buf[4];
-	char *buf2, *buf3;
+	unsigned char buf[4];
+	unsigned char *buf2, *buf3;
 	int e;
 
 	e = leer_aux( fd , buf , 4 );
@@ -85,11 +85,11 @@ int read_header( int fd , header* h ){
 	e = leer_aux( fd , buf , 4 );
 	h->link_size = str_to_int( buf );
 
-	buf2 = (char*)malloc( h->size );
+	buf2 = (unsigned char*)malloc( h->size );
 	e = leer_aux( fd , buf2 , h->name_size );
 	h->name = buf2;
 	if( h->link_size > 0 ){
-		buf3 = (char*)malloc( h->link_size );
+		buf3 = (unsigned char*)malloc( h->link_size );
 		e = leer_aux( fd , buf3 , h->link_size);
 		h->link_path = buf3;
 	}
@@ -97,16 +97,16 @@ int read_header( int fd , header* h ){
 }
 
 
-char * header_to_string(header * h){
+unsigned char * header_to_string(header * h){
 	
-	char * ret = NULL;
-	char * aux = NULL;
+	unsigned char * ret = NULL;
+	unsigned char * aux = NULL;
 	int size = 29;
 
 	size += h->name_size;
 	size += h->link_size;
 
-	ret = (char*) malloc(sizeof(char)*size);
+	ret = (unsigned char*) malloc(sizeof(unsigned char)*size);
 	aux = ret + 1;
 
 	ret[0] = 68;
@@ -127,10 +127,10 @@ void store_header(header * h, int fd){
 	write_aux(fd, 29 + h->name_size + h->link_size, header_to_string(h));
 }
 
-int save_data( int fd , char* path ){
+int save_data( int fd , unsigned char* path ){
 	
 	int a, l;
-	char buff[400];
+	unsigned char buff[400];
 
 	a = open( path , O_RDONLY );
 	l = 1;
@@ -142,7 +142,7 @@ int save_data( int fd , char* path ){
 	}
 }
 
-int pack( char** argv , int argc ){
+int pack( unsigned char** argv , int argc ){
 	
 	int fd;
 	header h;
@@ -161,7 +161,7 @@ int pack( char** argv , int argc ){
 	
 }
 
-void pack_dir(int fd, char * ruta){
+void pack_dir(int fd, unsigned char * ruta){
   
   DIR* dirp;
   struct dirent* de;
