@@ -122,7 +122,7 @@ int unpack( unsigned char * packed_file){
 			mkfifo(h.name, h.modo);
 		}
 		if ( (h.modo & __S_IFMT) == __S_IFREG ){
-			fd2 = open( h.name , O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRWXG | S_IROTH );
+			fd2 = open( h.name , O_RDWR | O_CREAT | O_TRUNC, h.modo );
 			loaddata( fd , fd2 , h.size);
 			close(fd2);
 		}
