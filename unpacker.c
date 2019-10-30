@@ -134,6 +134,6 @@ int unpack( unsigned char * packed_file){
 
 int main(){
 
-	unpack("mytar");
+	unpack("dirEquis/mytar");
 
 }

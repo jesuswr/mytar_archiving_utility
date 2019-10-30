@@ -46,7 +46,7 @@ unsigned char* make_path( unsigned char* path , unsigned char* name )
 	{
 		strcpy( ret , path );
 		ret[strlen(path)] = '/';
-		strcat( ret, name);
+		strcpy(ret + strlen(path)+1, name);
 	}
 	return ret;
 }
