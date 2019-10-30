@@ -12,8 +12,8 @@
 int loaddata(int fd1 , int fd2 , int size, int c){
 	unsigned char *buff;
 	buff = (unsigned char*)malloc(size);
-	leer_aux(fd1, buff, size);
-	if(c) descifrar_string(buff, size, DESP);
+	read_aux(fd1, buff, size);
+	if(c) decode_string(buff, size, DESP);
 	write_aux(fd2, size, buff);
 	free(buff);
 }
@@ -66,44 +66,44 @@ int read_header( int fd , header* h, int c){
 	unsigned char *buf2, *buf3;
 	int e;
 
-	e = leer_aux( fd , buf , 4 );
-	if(c) descifrar_string(buf, 4, DESP);
+	e = read_aux( fd , buf , 4 );
+	if(c) decode_string(buf, 4, DESP);
 	h->modo = str_to_int( buf );
 
-	e = leer_aux( fd , buf , 4 );
-	if(c) descifrar_string(buf, 4, DESP);
+	e = read_aux( fd , buf , 4 );
+	if(c) decode_string(buf, 4, DESP);
 	h->uid = str_to_int( buf );
 
-	e = leer_aux( fd , buf , 4 );
-	if(c) descifrar_string(buf, 4, DESP);
+	e = read_aux( fd , buf , 4 );
+	if(c) decode_string(buf, 4, DESP);
 	h->gid = str_to_int( buf );
 	
-	e = leer_aux( fd , buf , 4 );
-	if(c) descifrar_string(buf, 4, DESP);
+	e = read_aux( fd , buf , 4 );
+	if(c) decode_string(buf, 4, DESP);
 	h->size = str_to_int( buf );
 
-	e = leer_aux( fd , buf , 4 );
-	if(c) descifrar_string(buf, 4, DESP);
+	e = read_aux( fd , buf , 4 );
+	if(c) decode_string(buf, 4, DESP);
 	h->num_blocks = str_to_int( buf );
 
-	e = leer_aux( fd , buf , 4 );
-	if(c) descifrar_string(buf, 4, DESP);
+	e = read_aux( fd , buf , 4 );
+	if(c) decode_string(buf, 4, DESP);
 	h->name_size = str_to_int( buf );
 
-	e = leer_aux( fd , buf , 4 );
-	if(c) descifrar_string(buf, 4, DESP);
+	e = read_aux( fd , buf , 4 );
+	if(c) decode_string(buf, 4, DESP);
 	h->link_size = str_to_int( buf );
 
 
 	buf2 = (unsigned char*)malloc( h->name_size );
 
-	e = leer_aux( fd , buf2 , h->name_size );
-	if(c) descifrar_string(buf2, h->name_size, DESP);
+	e = read_aux( fd , buf2 , h->name_size );
+	if(c) decode_string(buf2, h->name_size, DESP);
 	h->name = buf2;
 	if( h->link_size > 0 ){
 		buf3 = (unsigned char*)malloc( h->link_size );
-		e = leer_aux( fd , buf3 , h->link_size);
-		if(c) descifrar_string(buf3, h->link_size, DESP);
+		e = read_aux( fd , buf3 , h->link_size);
+		if(c) decode_string(buf3, h->link_size, DESP);
 		h->link_path = buf3;
 	}
 	return 0;
@@ -139,7 +139,7 @@ unsigned char * header_to_string(header * h){
 void store_header(header * h, int fd, int c){
 	unsigned char * buf = header_to_string(h);
 	if(c){ 
-		cifrar_string(buf, 29 + h->name_size + h->link_size, DESP);
+		encode_string(buf, 29 + h->name_size + h->link_size, DESP);
 		buf[0] = 'C';
 	}
 	write_aux(fd, 29 + h->name_size + h->link_size, buf);
@@ -156,7 +156,7 @@ int save_data( int fd , char* path, int c){
 	while( l > 0 ){
 
 		l = read( a , buff , 400 );
-		if(c) cifrar_string(buff, l, DESP);
+		if(c) encode_string(buff, l, DESP);
 		write_aux( fd , l , buff );
 
 	}
@@ -362,7 +362,7 @@ int show_content_file(int flag_mask, char * packed_file, char * v_output_file){
 		write_aux(fd_v_output, 1, "\n");
 
 		if ( (h.modo & __S_IFMT) == __S_IFREG ){
-			leer_aux(fd, NULL, h.size);
+			read_aux(fd, NULL, h.size);
 		}
 
 	}

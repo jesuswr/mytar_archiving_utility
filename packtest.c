@@ -12,7 +12,7 @@
 
 int main(int argc, unsigned char ** argv){
 
-	/*pack(__F_IFZ | __F_IFN, argv, argc, argv[1], NULL, 3);*/
+	/*pack(0, argv, argc, argv[1], NULL, 3);*/
     /*show_content_file(0,"mytar", NULL);*/
-	unpack(__F_IFY, "mytar", NULL, NULL, 3);
+	unpack(0, "nose", NULL, NULL, 0);
 }
