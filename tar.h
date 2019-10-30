@@ -35,7 +35,7 @@ int read_header( int fd , header* h, int c);
 
 char * header_to_string(header * h);
 
-void store_header(header * h, int fd, int c);
+int store_header(header * h, int fd, int c);
 
 int save_data( int fd , char* path, int c);
 
