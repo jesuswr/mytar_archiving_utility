@@ -1,21 +1,13 @@
 #include <stdio.h>
 #include <unistd.h>
+#include "tar.h"
 
-#define __F_IFF 1<<1
-#define __F_IFC 1<<2
-#define __F_IFN 1<<3
-#define __F_IFT 1<<4
-#define __F_IFO 1<<5
-#define __F_IFZ 1<<6
-#define __F_IFY 1<<7
-#define __F_IFX 1<<8
-#define __F_IFS 1<<9
-#define __F_IFV 1<<10
 
-main(int argc, char *argv[]) {
+
+int main(int argc, char *argv[]) {
    int option;
    // put ':' at the starting of the string so compiler can distinguish between '?' and ':'
-   /*while((option = getopt(argc, argv, ":if:lrx")) != -1){ //get option from the getopt() method
+   while((option = getopt(argc, argv, ":if:lrx")) != -1){ //get option from the getopt() method
       switch(option){
          //For option i, r, l, print that these are options
          case 'i':
@@ -33,8 +25,9 @@ main(int argc, char *argv[]) {
             printf("unknown option: %c\n", optopt);
             break;
       }
-   }*/
+   }
 
+   int FLAG_MASK = 0;
 
    while((option = getopt(argc, argv, ":f:cnto:z:y:x:s:v:")) != -1){ //get option from the getopt() method
       switch(option){
