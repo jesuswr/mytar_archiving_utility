@@ -14,9 +14,9 @@
 *		stores the bytes of the int in an char array of size 4
 *
 *		x : int to store
-*		ret : pointer to the array of unsigned chars
+*		ret : pointer to the array of chars
 */
-void int_to_char(int x, unsigned char * ret);
+void int_to_char(int x, char * ret);
 
 /*
 *	Function : write_aux
@@ -26,23 +26,23 @@ void int_to_char(int x, unsigned char * ret);
 *
 *		fd : file descriptor of the file to write
 *		len : ammount of chars to write from buf
-*		buf : array of unsigned chars to write from
+*		buf : array of chars to write from
 *
 *		returns 0 in case of success or -1 in case of failure		
 */
-int write_aux(int fd, int len, unsigned char * buf);
+int write_aux(int fd, int len, char * buf);
 
 /*
 *	Function : rotate_char
 *	-----------------------------------------------------------
 *		rotates the bits of a char to the right the given number of times
 *
-*		a : unsigned char to rotate the bits from
+*		a : char to rotate the bits from
 *		desp : number of times to rotate
 *
-*		returns an unsigned char with the rotated bits
+*		returns an char with the rotated bits
 */
-unsigned char rotate_char(unsigned char a, int desp);
+char rotate_char(char a, int desp);
 
 /*
 *	Function : encode_string
@@ -53,7 +53,7 @@ unsigned char rotate_char(unsigned char a, int desp);
 *		len : size of the array
 *		desp : number of times to rotate	
 */
-void encode_string(unsigned char * s, int len, int desp);
+void encode_string(char * s, int len, int desp);
 
 /*
 *	Function : decode_string
@@ -64,7 +64,7 @@ void encode_string(unsigned char * s, int len, int desp);
 *		len : size of the array
 *		desp : number of times to rotate	
 */
-void decode_string(unsigned char * s, int len, int desp);
+void decode_string(char * s, int len, int desp);
 
 
 /*
@@ -77,21 +77,21 @@ void decode_string(unsigned char * s, int len, int desp);
 
 *		returns an array of chars of the form path/name	
 */
-unsigned char* make_path( unsigned char* path , unsigned char* name );
+char* make_path( char* path , char* name );
 
 /*
 *	Function : read_aux
 *	-----------------------------------------------------------
 *		helper function to read the content of a file to an
-*		array of unsigned chars
+*		array of chars
 *
 *		fd : file descriptor of the file to read from
 *		len : ammount of chars to read 
-*		buf : array of unsigned chars to write 
+*		buf : array of chars to write 
 *
 *		returns 0 in case of success or -1 in case of failure		
 */
-int read_aux( int fd , unsigned char* buf , int l );
+int read_aux( int fd , char* buf , int l );
 
 /*
 *	Function : str_to_int
@@ -102,6 +102,6 @@ int read_aux( int fd , unsigned char* buf , int l );
 *
 *		returns an int that has the bits of the array
 */
-int str_to_int( unsigned char* c  );
+int str_to_int( char* c  );
 
 #endif

@@ -23,8 +23,8 @@ typedef struct {
 	int num_blocks;
 	int name_size;
 	int link_size;
-	unsigned char* name;
-	unsigned char* link_path;
+	char* name;
+	char* link_path;
 } header;
 
 int loaddata(int fd1 , int fd2 , int size, int c);
@@ -33,7 +33,7 @@ int get_header( char* path_and_name , header *h );
 
 int read_header( int fd , header* h, int c);
 
-unsigned char * header_to_string(header * h);
+char * header_to_string(header * h);
 
 void store_header(header * h, int fd, int c);
 

@@ -10,8 +10,8 @@
 #include "utilities.h" 
 
 int loaddata(int fd1 , int fd2 , int size, int c){
-	unsigned char *buff;
-	buff = (unsigned char*)malloc(size);
+	char *buff;
+	buff = (char*)malloc(size);
 	read_aux(fd1, buff, size);
 	if(c) decode_string(buff, size, DESP);
 	write_aux(fd2, size, buff);
@@ -22,8 +22,8 @@ int get_header( char* path_and_name , header *h ){
 	
 	struct stat sb;
 	int x, y, l;
-	unsigned char * c;
-	unsigned char * c2;
+	char * c;
+	char * c2;
 
 	x = lstat( path_and_name , &sb );
 
@@ -34,18 +34,18 @@ int get_header( char* path_and_name , header *h ){
 	h->num_blocks = sb.st_blocks;
 	h->name_size = strlen( (char *) path_and_name );
 
-	c = ( unsigned char * ) malloc( h->name_size );
+	c = ( char * ) malloc( h->name_size );
 	strcpy((char *) c , (char *) path_and_name );
 
 	h->name = c;
 
 	if ( ( sb.st_mode & __S_IFMT ) == __S_IFLNK ){	
 		
-		c = ( unsigned char * )malloc(400);
+		c = ( char * )malloc(400);
 		l = 0;
 		l += readlink( path_and_name , c , 399 );
 		c[l] = '\0';
-		c2 = ( unsigned char * )malloc( strlen( (char *) c) );
+		c2 = ( char * )malloc( strlen( (char *) c) );
 		strcpy((char *) c2, (char *) c);
 		h->link_size = l;
 		h->link_path = c2;
@@ -62,14 +62,14 @@ int get_header( char* path_and_name , header *h ){
 
 int read_header( int fd , header* h, int c){
 	/* RECORDAR LEER LA CASILLA LIBRE ANTES DE LLAMAR LA FUNCION */
-	unsigned char buf[4];
-	unsigned char *buf2, *buf3;
+	char buf[4];
+	char *buf2, *buf3;
 	int e;
 
 	e = read_aux( fd , buf , 4 );
 	if(c) decode_string(buf, 4, DESP);
 	h->modo = str_to_int( buf );
-
+	
 	e = read_aux( fd , buf , 4 );
 	if(c) decode_string(buf, 4, DESP);
 	h->uid = str_to_int( buf );
@@ -95,13 +95,13 @@ int read_header( int fd , header* h, int c){
 	h->link_size = str_to_int( buf );
 
 
-	buf2 = (unsigned char*)malloc( h->name_size );
+	buf2 = (char*)malloc( h->name_size );
 
 	e = read_aux( fd , buf2 , h->name_size );
 	if(c) decode_string(buf2, h->name_size, DESP);
 	h->name = buf2;
 	if( h->link_size > 0 ){
-		buf3 = (unsigned char*)malloc( h->link_size );
+		buf3 = (char*)malloc( h->link_size );
 		e = read_aux( fd , buf3 , h->link_size);
 		if(c) decode_string(buf3, h->link_size, DESP);
 		h->link_path = buf3;
@@ -110,16 +110,16 @@ int read_header( int fd , header* h, int c){
 }
 
 
-unsigned char * header_to_string(header * h){
+char * header_to_string(header * h){
 	
-	unsigned char * ret = NULL;
-	unsigned char * aux = NULL;
+	char * ret = NULL;
+	char * aux = NULL;
 	int size = 29;
 
 	size += h->name_size;
 	size += h->link_size;
 
-	ret = (unsigned char*) malloc(sizeof(unsigned char)*size);
+	ret = (char*) malloc(sizeof(char)*size);
 	aux = ret + 1;
 
 	ret[0] = 68;
@@ -137,7 +137,7 @@ unsigned char * header_to_string(header * h){
 }
 
 void store_header(header * h, int fd, int c){
-	unsigned char * buf = header_to_string(h);
+	char * buf = header_to_string(h);
 	if(c){ 
 		encode_string(buf, 29 + h->name_size + h->link_size, DESP);
 		buf[0] = 'C';
@@ -148,7 +148,7 @@ void store_header(header * h, int fd, int c){
 int save_data( int fd , char* path, int c){
 	
 	int a, l;
-	unsigned char buff[400];
+	char buff[400];
 
 	a = open( path , O_RDONLY );
 	l = 1;
@@ -241,7 +241,7 @@ int unpack(int flag_mask, char * packed_file, char * v_output_file, char * unpac
 	
 	int fd, fd2;
 	header h;
-	unsigned char buf;
+	char buf;
 	DESP = 0;
 
 	fd = open(packed_file, O_RDWR);
@@ -258,7 +258,6 @@ int unpack(int flag_mask, char * packed_file, char * v_output_file, char * unpac
 		write_aux(fd_v_output, strlen(packed_file), packed_file);
 		write_aux(fd_v_output, 1, "\n");
 	}
-
 	while ( read(fd , &buf, 1)==1 && (buf=='D' || buf=='C') ){
 
 		if((flag_mask & __F_IFY) && buf != 'C'){
@@ -304,11 +303,11 @@ int show_content_file(int flag_mask, char * packed_file, char * v_output_file){
 	
 	int fd, fd2, i;
 	header h;
-	unsigned char buf;
-	unsigned char * aux;
+	char buf;
+	char * aux;
 	DESP = 0;
 
-	aux =  (unsigned char *) malloc(4); 
+	aux =  (char *) malloc(4); 
 	aux[0] = 'x';
 	aux[1] = 'w';
 	aux[2] = 'r';

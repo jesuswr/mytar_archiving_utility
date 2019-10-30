@@ -19,13 +19,13 @@
 *		the third and finally for the fourth
 *
 *		x : int to store
-*		ret : pointer to the array of unsigned chars
+*		ret : pointer to the array of chars
 */
 
-void int_to_char(int x, unsigned char * ret){
+void int_to_char(int x, char * ret){
 	int i;
 	for(i=0; i<4; i++){
-		ret[i] = (x)&255;
+		ret[i] = (char) (x)&255;
 		x >>= 8;
 	}
 }
@@ -38,11 +38,11 @@ void int_to_char(int x, unsigned char * ret){
 *
 *		fd : file descriptor of the file to write
 *		len : ammount of chars to write from buf
-*		buf : array of unsigned chars to write from
+*		buf : array of chars to write from
 *
 *		returns 0 in case of success or -1 in case of failure		
 */
-int write_aux(int fd, int len, unsigned char * buf){
+int write_aux(int fd, int len, char * buf){
 	int e , len2 = 0;
 	while(len2 < len){
 		e = write(fd, buf + len2, len-len2);
@@ -56,12 +56,12 @@ int write_aux(int fd, int len, unsigned char * buf){
 *	-----------------------------------------------------------
 *		uses bit magic to rotate the bits easily to the left
 *
-*		a : unsigned char to rotate the bits from
+*		a : char to rotate the bits from
 *		desp : number of times to rotate
 *
-*		returns an unsigned char with the rotated bits
+*		returns an char with the rotated bits
 */
-unsigned char rotate_char(unsigned char a, int desp){
+char rotate_char(char a, int desp){
 	int i;
 	a = ( a << desp ) | ( a >> 8 - desp );
 	return a;
@@ -78,7 +78,7 @@ unsigned char rotate_char(unsigned char a, int desp){
 *		len : size of the array
 *		desp : number of times to rotate	
 */
-void encode_string(unsigned char * s, int len, int desp){
+void encode_string(char * s, int len, int desp){
 	int i;
 	for(i=0; i<len; i++) s[i] = rotate_char(s[i], 8 -(desp%8));
 }
@@ -93,7 +93,7 @@ void encode_string(unsigned char * s, int len, int desp){
 *		desp : number of times to rotate	
 */
 
-void decode_string(unsigned char * s, int len, int desp){
+void decode_string(char * s, int len, int desp){
 	int i;
 	for(i=0; i<len; i++) s[i] = rotate_char(s[i], desp%8);
 }
@@ -110,9 +110,9 @@ void decode_string(unsigned char * s, int len, int desp){
 
 *		returns an array of chars of the form path/name	
 */
-unsigned char* make_path( unsigned char* path , unsigned char* name ){
-	unsigned char *ret = 
-		(unsigned char *)malloc( strlen(path) + strlen(name) + 1);
+char* make_path( char* path , char* name ){
+	char *ret = 
+		(char *)malloc( strlen(path) + strlen(name) + 1);
 	if ( strlen(path) == 0 ){
 		strcpy( ret , name );	
 	}
@@ -132,11 +132,11 @@ unsigned char* make_path( unsigned char* path , unsigned char* name ){
 *
 *		fd : file descriptor of the file to read from
 *		len : ammount of chars to read 
-*		buf : array of unsigned chars to write 
+*		buf : array of chars to write 
 *
 *		returns 0 in case of success or -1 in case of failure		
 */
-int read_aux( int fd , unsigned char* buf , int l ){
+int read_aux( int fd , char* buf , int l ){
 	int l2, e;
 	l2 = 0;
 	while ( l2 < l ){
@@ -159,12 +159,12 @@ int read_aux( int fd , unsigned char* buf , int l ){
 *
 *		returns an int that has the bits of the array
 */
-int str_to_int( unsigned char* c  ){
+int str_to_int( char* c  ){
 	int x, i;
 	x = 0;
 	for( i = 3 ; i >= 0 ; i-- ){
 		x = x << 8;
-		x = x | c[i];
+		x = x | (unsigned char)(c[i]);
 	}
 	return x;
 }
