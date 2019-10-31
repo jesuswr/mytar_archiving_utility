@@ -59,6 +59,7 @@ int get_header( char* path_and_name , header *h ){
 	int x, y, l;
 	char * c;
 	char * c2;
+	char * c3;
 
 	x = lstat( path_and_name , &sb );
 
@@ -81,21 +82,21 @@ int get_header( char* path_and_name , header *h ){
 
 	if ( ( sb.st_mode & __S_IFMT ) == __S_IFLNK ){	
 		
-		c = ( char * )malloc(400);
+		c3 = ( char * )malloc(200);
 		if ( c == NULL ){
 			return -2;
 		}
 		l = 0;
-		l += readlink( path_and_name , c , 399 );
-		c[l] = '\0';
-		c2 = ( char * )malloc( strlen( (char *) c) );
+		l += readlink( path_and_name , c3 , 399 );
+		c3[l] = '\0';
+		c2 = ( char * )malloc( strlen(c3) );
 		if ( c2 == NULL ){
 			return -2;
 		}
-		strcpy((char *) c2, (char *) c);
+		strcpy(c2, c3);
 		h->link_size = l;
 		h->link_path = c2;
-		free(c);
+		free(c3);
 	}
 	else{
 		h->link_size = 0;
@@ -385,6 +386,7 @@ void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
   	struct dirent* de;
   	header h;
   	int e;
+  	char *c;
 
   	dirp = opendir( path );
  	if ( dirp == NULL ){
@@ -393,7 +395,8 @@ void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
     }
 	while( de = readdir( dirp ) ){
 
-		e = get_header( make_path(path, (de->d_name)), &h);
+		e = get_header( c = make_path(path, (de->d_name)), &h);
+		free(c);
 		if ( e < 0 ){
 			e = write_aux( fd_v_output , 40 , "Error using lstat to get the file info.\n");
 			if ( e < 0 ) printf("Error using lstat to get the file info.\n");
@@ -403,7 +406,6 @@ void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
 		if((flag_mask & __F_IFN) && ((( h.modo & __S_IFMT ) == __S_IFLNK) 
 			|| (( h.modo & __S_IFMT ) == __S_IFIFO))) continue;
 
-		/* ARREGLAR ESTA LINEA DE ABAJO, LA PARTE DE mytar */
 		if(strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0 
 			|| strcmp(de->d_name, pack_file)==0) continue; 
 	
@@ -437,9 +439,8 @@ void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
 		free(h.name);
 		if ( h.link_size > 0 ) free(h.link_path);
   	}
+  	free( path );
   	closedir(  dirp );
-  	free(h.name);
-
 }
 
 /*
