@@ -142,8 +142,9 @@ int pack( int flag_mask, char** argv , int argc,
 *		flag_mask : int that represents what flags are on
 *		fd : file descriptor of the tar file to save the data in
 *		path : path of the current dir that we are saving
+*		pack_file : to avoid packing the packed file
 */
-void pack_dir(int flag_mask, int fd, char * ruta);
+void pack_dir(int flag_mask, int fd, char * path, char * pack_file)
 
 /*
 *	Function : unpack

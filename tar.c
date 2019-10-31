@@ -357,7 +357,7 @@ int pack( int flag_mask, char** argv , int argc, char * pack_file,
 
 		if ( ( h.modo & __S_IFMT ) == __S_IFLNK) continue;
 		if ( ( h.modo & __S_IFMT ) == __S_IFDIR ) 
-			pack_dir(flag_mask, fd , argv[i] );
+			pack_dir(flag_mask, fd , argv[i] , pack_file);
 		if ( ( h.modo & __S_IFMT ) == __S_IFREG ) 
 			save_data( fd , argv[i], DESP);
 
@@ -380,7 +380,7 @@ int pack( int flag_mask, char** argv , int argc, char * pack_file,
 *		fd : file descriptor of the tar file to save the data in
 *		path : path of the current dir that we are saving
 */
-void pack_dir(int flag_mask, int fd, char * path){
+void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
   	DIR* dirp;
   	struct dirent* de;
   	header h;
@@ -405,7 +405,7 @@ void pack_dir(int flag_mask, int fd, char * path){
 
 		/* ARREGLAR ESTA LINEA DE ABAJO, LA PARTE DE mytar */
 		if(strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0 
-			|| strcmp(de->d_name, "mytar")==0) continue; 
+			|| strcmp(de->d_name, pack_file)==0) continue; 
 	
 		e = store_header( &h, fd, DESP);
 		if ( e < 0 ){
@@ -425,7 +425,7 @@ void pack_dir(int flag_mask, int fd, char * path){
 
 		if(( h.modo & __S_IFMT ) == __S_IFLNK) continue;
 		if( (h.modo & __S_IFDIR) == __S_IFDIR) 
-			pack_dir(flag_mask, fd, make_path(path, (de->d_name)) );
+			pack_dir(flag_mask, fd, make_path(path, (de->d_name)), "." );
 		if( (h.modo & __S_IFREG) == __S_IFREG) {
 			e = save_data(fd, make_path(path, (de->d_name)), DESP);
 			if ( e < 0 ){
