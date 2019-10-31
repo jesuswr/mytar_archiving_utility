@@ -29,7 +29,6 @@ int check_conflict(int mask){
    if((mask & __F_IFS) && (mask & __F_IFC)) return 1;
    if((mask & __F_IFS) && (mask & __F_IFN)) return 1;
    if((mask & __F_IFS) && (mask & __F_IFT)) return 1;
-   if((mask & __F_IFS) && (mask & __F_IFO)) return 1;
    if((mask & __F_IFS) && (mask & __F_IFZ)) return 1;
    if((mask & __F_IFS) && (mask & __F_IFX)) return 1;
    if((mask & __F_IFV) && (mask & __F_IFT)) return 1;
@@ -48,7 +47,7 @@ int check_conflict(int mask){
 int main(int argc, char *argv[]) {
    
    int FLAG_MASK = 0, FLAG_MASK_AUX;
-   int i, j, len, args_number=0;
+   int i, j, len, args_number=0, desp=0;
    int is_flag[26];
    char c;
    char * flag_args[26];
@@ -81,19 +80,34 @@ int main(int argc, char *argv[]) {
             
             c = argv[i][j];
             
-            if(c>'z' || c<'c' || !is_flag[c - 'a'] ) {printf("pelaste mano 1\n"); return -1;}
-            if(FLAG_MASK & (1<<is_flag[c - 'a']) ) {printf("pelaste mano 2\n"); return -1;}
+            if(c>'z' || c<'c' || !is_flag[c - 'a'] ) {
+               printf("Invalid format\n"); 
+               return -1;
+            }
+            if(FLAG_MASK & (1<<is_flag[c - 'a']) ) {
+               printf("Invalid format\n"); 
+               return -1;
+            }
             
             FLAG_MASK_AUX |= (1<<is_flag[c - 'a']);
 
-            if((FLAG_MASK_AUX & __MUST_HAVE_ARG)!=0 && j<len-1 ) {printf("pelaste mano 3\n"); return -1;}
+            if((FLAG_MASK_AUX & __MUST_HAVE_ARG)!=0 && j<len-1 ) {
+               printf("Invalid format\n"); 
+               return -1;
+            }
 
          }
 
          if(FLAG_MASK_AUX & __MAY_HAVE_ARG){
             
-            if(i+1 >= argc) {printf("pelaste mano 4\n"); return -1;}
-            if(!valid_name(argv[i+1])) {printf("pelaste mano 5\n"); return -1;}
+            if(i+1 >= argc) {
+               printf("Invalid format\n"); 
+               return -1;
+            }
+            if(!valid_name(argv[i+1])) {
+               printf("Invalid format\n"); 
+               return -1;
+            }
             
             c = argv[i][len-1];
             flag_args[c - 'a'] = (char *) malloc(strlen(argv[i+1])+1);
@@ -106,7 +120,10 @@ int main(int argc, char *argv[]) {
 
       }else{
          
-         if(!valid_name(argv[i])) {printf("pelaste mano 6\n"); return -1;}
+         if(!valid_name(argv[i])) {
+            printf("Invalid format\n"); 
+            return -1;
+         }
          other_args[args_number] = (char *) malloc(strlen(argv[i])+1);
          strcpy( other_args[args_number], argv[i] );
          args_number++;
@@ -115,10 +132,35 @@ int main(int argc, char *argv[]) {
 
    }
 
-   if(check_conflict(FLAG_MASK)) {printf("pelaste mano 7\n"); return -1;}
-   if(__F_IFC && args_number==0) {printf("pelaste mano 8\n"); return -1;}
+   if(check_conflict(FLAG_MASK)) {
+      printf("Invalid format\n");
+      return -1;
+   }
+   if((__F_IFC & FLAG_MASK) && args_number==0) {
+      printf("Invalid format\n");
+       return -1;
+   }
 
-   printf("Brujaa lo lograstee!!\n");
+   if(flag_args['f'-'a'] == NULL){
+      flag_args['f'-'a'] = (char *) malloc(9);
+      strcpy(flag_args['f'-'a'], "mytar.mt");
+   }
+
+   if( __F_IFC & FLAG_MASK ){
+      if(flag_args['z'-'a'] != NULL) desp = atoi(flag_args['z'-'a']);
+      pack(FLAG_MASK, other_args, args_number, flag_args['f'-'a'], flag_args['v'-'a'], desp);
+   }
+   if(__F_IFX & FLAG_MASK){
+      if(flag_args['y'-'a'] != NULL) desp = atoi(flag_args['y'-'a']);
+      unpack(FLAG_MASK, flag_args['f'-'a'], flag_args['v'-'a'], flag_args['o'-'a'], desp);
+   }
+   if(__F_IFT & FLAG_MASK){
+      show_content_file(FLAG_MASK, flag_args['f'-'a'], flag_args['v'-'a']);
+   }
+   if(__F_IFS & FLAG_MASK){
+      if(flag_args['y'-'a'] != NULL) desp = atoi(flag_args['y'-'a']);
+      single_extract(FLAG_MASK, flag_args['s'-'a'], flag_args['f'-'a'], flag_args['v'-'a'], flag_args['o'-'a'], desp);
+   }
 
    return 0;
 }
