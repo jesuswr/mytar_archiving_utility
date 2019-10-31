@@ -35,7 +35,7 @@ int read_header( int fd , header* h, int c);
 
 char * header_to_string(header * h);
 
-void store_header(header * h, int fd, int c);
+int store_header(header * h, int fd, int c);
 
 int save_data( int fd , char* path, int c);
 
@@ -48,5 +48,7 @@ int unpack(int flag_mask, char * packed_file, char * v_output_file, char * unpac
 int show_content_file(int flag_mask, char * packed_file, char * v_output_file);
 
 void write_aux_int(int fd, int n);
+
+int single_extract(int flag_mask, char* f_name, char * packed_file, char * v_output_file, char * unpacking_dir, int desp);
 
 #endif

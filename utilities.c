@@ -168,3 +168,14 @@ int str_to_int( char* c  ){
 	}
 	return x;
 }
+
+int str_cmp ( char * path , char * name ){
+	int i, j;
+	i = 0;
+	j = 0;
+	for( i = 0 ; i < strlen(path) ; i++){
+		if ( path[i] == '/' ) j = i;
+	}
+
+	return strcmp( path + j +1 , name );
+}
