@@ -49,4 +49,6 @@ int show_content_file(int flag_mask, char * packed_file, char * v_output_file);
 
 void write_aux_int(int fd, int n);
 
+int single_extract(int flag_mask, char* f_name, char * packed_file, char * v_output_file, char * unpacking_dir, int desp);
+
 #endif

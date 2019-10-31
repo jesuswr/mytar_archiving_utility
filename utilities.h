@@ -104,4 +104,6 @@ int read_aux( int fd , char* buf , int l );
 */
 int str_to_int( char* c  );
 
+int str_cmp ( char * path , char * name );
+
 #endif

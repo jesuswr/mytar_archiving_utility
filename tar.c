@@ -561,3 +561,130 @@ void write_aux_int(int fd, int n){
 	write_aux(fd, len, buf);
 
 }
+
+int single_extract(int flag_mask, char* f_name, char * packed_file, char * v_output_file, char * unpacking_dir, int desp){
+	int fd, fd2, e;
+	header h;
+	char buf, *buf2;
+	DESP = 0;
+
+	if(flag_mask & __F_IFO) chdir(unpacking_dir);
+
+	if(flag_mask & __F_IFY) DESP = desp;
+
+	fd_v_output = 1;
+
+	if((flag_mask & __F_IFV) == __F_IFV){
+		if(v_output_file != NULL) fd_v_output = open(v_output_file, O_RDWR | O_CREAT | O_TRUNC,  S_IRWXU | S_IRWXG | S_IROTH );
+		if ( fd_v_output < 0 ){
+			printf("Error opening the output file. The output will be on the terminal.\n");
+			fd_v_output = 1;
+		}
+		e = write_aux(fd_v_output, 33, "Starting unpacking...\nOpening file ");
+		if ( e < 0 ) printf("Error trying to write in the wanted file descriptor.\n");
+		e = write_aux(fd_v_output, strlen(packed_file), packed_file);
+		if ( e < 0 ) printf("Error trying to write in the wanted file descriptor.\n");
+		e = write_aux(fd_v_output, 1, "\n");
+		if ( e < 0 ) printf("Error trying to write in the wanted file descriptor.\n");
+	}
+
+	fd = open(packed_file, O_RDWR);
+	if ( fd < 0 ){
+		e = write_aux( fd_v_output , 34 , "Error opening the file to unpack.\n");
+		if ( e < 0 ){
+			printf("Error opening the file to unpack.\n");
+		}
+		return -1;
+	}
+
+	while ( read(fd , &buf , 1)==1 && (buf=='D' || buf=='C') ){
+
+		if((flag_mask & __F_IFY) && buf != 'C'){
+			e = write_aux( fd_v_output , 55 , "The tar is not crypted but the decrypt flag was given.\n");
+			if ( e < 0 ) printf("The tar is not crypted but the decrypt flag was give.\n");
+			return -1;
+		}
+
+		if( !(flag_mask & __F_IFY) && buf == 'C' ){
+			e = write_aux( fd_v_output , 55 , "The tar is crypted but the decrypt flag was not given.\n");
+			if ( e < 0 ) printf("The tar is not crypted but the decrypt flag was give.\n");
+			return -1;
+		}
+
+		e = read_header(fd, &h, DESP);
+		if ( e < 0 ){
+			e = write_aux( fd_v_output , 28 , "Error reading the tar file.\n");
+			if ( e < 0 ) printf("Error reading the tar file.\n");
+		}
+
+		if((flag_mask & __F_IFN) && ((( h.modo & __S_IFMT ) == __S_IFLNK) || (( h.modo & __S_IFMT ) == __S_IFIFO))) continue;
+
+		if((flag_mask & __F_IFV) == __F_IFV){
+			e = write_aux(fd_v_output, 10, "Looking ");
+			if ( e < 0 ) printf("Error writing verbose in the given output file.\n");
+			write_aux(fd_v_output, strlen(h.name), h.name);
+			if ( e < 0 ) printf("Error writing verbose in the given output file.\n");
+			write_aux(fd_v_output, 1, "\n");
+			if ( e < 0 ) printf("Error writing verbose in the given output file.\n");
+		}
+		if ( str_cmp( h.name , f_name ) == 0 ){	
+			if ( (h.modo & __S_IFMT) == __S_IFDIR ){
+				e = mkdir(f_name, h.modo);
+				if ( e < 0 ){
+					e = write_aux( fd_v_output , 28 , "Error creating a directory.\n" );
+					if ( e < 0 ) printf("Error creating a directory.\n");
+				}
+			}
+			if ( (h.modo & __S_IFMT ) == __S_IFLNK ){
+				e = symlink(h.link_path, f_name);
+				if ( e < 0 ){
+					e = write_aux( fd_v_output , 32 , "Error creating a symbolic link.\n" );
+					if ( e < 0 ) printf("Error creating a symbolic link.\n");
+				}
+			}
+			if ( ( h.modo & __S_IFMT ) == __S_IFIFO ){
+				e = mkfifo(f_name, h.modo);
+				if ( e < 0 ){
+					e = write_aux( fd_v_output , 23 , "Error creating a pipe.\n");
+					if ( e < 0 ) printf("Error creating a pipe.\n");
+				}
+			}
+			if ( (h.modo & __S_IFMT) == __S_IFREG ){
+				fd2 = open( f_name , O_RDWR | O_CREAT | O_TRUNC, h.modo );
+				if ( fd2 < 0 ){
+					e = write_aux( fd_v_output , 31 , "Error creating a regular file.\n" );
+					if ( e < 0 ) printf("Error creating a regular file.\n");
+					continue;
+				}
+				e = loaddata( fd , fd2 , h.size, DESP);
+				if ( e < 0 ){
+					e = write_aux( fd_v_output , 31 , "Error creating a regular file.\n" );
+					if ( e < 0 ) printf("Error creating a regular file.\n");
+					continue;
+				}
+				close(fd2);
+			}
+			free(h.name);
+			if ( h.link_size > 0 ) free(h.link_path);
+			close(fd);
+			return 0;
+		}
+		else
+		{
+			if ( (h.modo & __S_IFMT) == __S_IFREG ){
+				buf2 = (char*)malloc(h.size);
+				e = read( fd , buf2 , h.size );
+				free(buf2);
+				if ( e < 0 ){
+					e = write_aux( fd_v_output , 31 , "Error creating a regular file.\n" );
+					if ( e < 0 ) printf("Error creating a regular file.\n");
+					continue;
+				}
+			}
+		}
+	}	
+	close( fd );
+	e = write_aux( fd_v_output , 42 , "The given file is not in the tar archive.\n");
+	if ( e < 0 ) printf("The given file is not in the tar archive.\n");
+	return 0;
+}
