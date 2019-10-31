@@ -1,5 +1,6 @@
 /*
 *	File:			utilities.h
+*	Author: 		Jesus Wahrman 15-11540 , Neil Villamizar 15-11523
 *	Description:	file that contains the signature of some useful
 *					functions used in tar
 *	Date:			29 / 10 / 19
@@ -40,7 +41,7 @@ int write_aux(int fd, int len, char * buf);
 *		a : char to rotate the bits from
 *		desp : number of times to rotate
 *
-*		returns an char with the rotated bits
+*		returns a char with the rotated bits
 */
 char rotate_char(char a, int desp);
 
@@ -104,6 +105,16 @@ int read_aux( int fd , char* buf , int l );
 */
 int str_to_int( char* c  );
 
+/*
+*	Function : str_cmp
+*	-----------------------------------------------------------
+*		compares the last name of a path with a name
+*
+*		path : char array that represents the path
+*		name : char array that represents the name
+*
+*		returns 0 if the last name in the path is the same as name
+*/
 int str_cmp ( char * path , char * name );
 
 #endif
