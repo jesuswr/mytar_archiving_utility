@@ -1,10 +1,10 @@
 OPTS=-ansi -Wpedantic
 
-packtest: tar.o utilities.o packtest.o
-	gcc $(OPTS)  -o packtest tar.o utilities.o packtest.o
+mytar: tar.o utilities.o mytar.o
+	gcc $(OPTS)  -o mytar tar.o utilities.o mytar.o
 
-packtest.o: packtest.c tar.h utilities.h
-	gcc $(OPTS) -c packtest.c 
+mytar.o: mytar.c tar.h utilities.h
+	gcc $(OPTS) -c mytar.c 
 
 tar.o: tar.c tar.h utilities.h
 	gcc $(OPTS) -c tar.c
@@ -14,4 +14,4 @@ utilities.o: utilities.c utilities.h
 
 clean:
 	if find *.o; then rm *.o; fi
-	if find packtest; then rm packtest; fi
+	if find mytar; then rm mytar; fi
