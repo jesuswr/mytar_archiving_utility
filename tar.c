@@ -464,6 +464,7 @@ int unpack(int flag_mask, char * packed_file,
 	header h;
 	char buf;
 	DESP = 0;
+	fd = open(packed_file, O_RDWR);
 
 	if(flag_mask & __F_IFO) chdir(unpacking_dir);
 
@@ -487,7 +488,6 @@ int unpack(int flag_mask, char * packed_file,
 		if ( e < 0 ) printf("Error trying to write in the wanted file descriptor.\n");
 	}
 
-	fd = open(packed_file, O_RDWR);
 	if ( fd < 0 ){
 		e = write_aux( fd_v_output , 34 , "Error opening the file to unpack.\n");
 		if ( e < 0 ){

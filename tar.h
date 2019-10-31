@@ -144,7 +144,7 @@ int pack( int flag_mask, char** argv , int argc,
 *		path : path of the current dir that we are saving
 *		pack_file : to avoid packing the packed file
 */
-void pack_dir(int flag_mask, int fd, char * path, char * pack_file)
+void pack_dir(int flag_mask, int fd, char * path, char * pack_file);
 
 /*
 *	Function : unpack

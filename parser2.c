@@ -69,7 +69,6 @@ int main(int argc, char *argv[]) {
    is_flag['v'-'a'] = 10;
 
    for(i=1; i<argc; i++){
-      //printf("jeje %d\n", i);
       
       if(argv[i][0] == '-'){
          
@@ -155,7 +154,7 @@ int main(int argc, char *argv[]) {
       unpack(FLAG_MASK, flag_args['f'-'a'], flag_args['v'-'a'], flag_args['o'-'a'], desp);
    }
    if(__F_IFT & FLAG_MASK){
-      show_content_file(FLAG_MASK, flag_args['f'-'a'], flag_args['v'-'a']);
+      show_content_file(FLAG_MASK, flag_args['f'-'a'], flag_args['v'-'a'], desp);
    }
    if(__F_IFS & FLAG_MASK){
       if(flag_args['y'-'a'] != NULL) desp = atoi(flag_args['y'-'a']);
