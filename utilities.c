@@ -111,7 +111,7 @@ void decode_string(char * s, int len, int desp){
 */
 char* make_path( char* path , char* name ){
 	char *ret = 
-		(char *)malloc( strlen(path) + strlen(name) + 1);
+		(char *)malloc( strlen(path) + strlen(name)  + 2);
 	if ( strlen(path) == 0 ){
 		strcpy( ret , name );	
 	}

@@ -16,7 +16,7 @@
 #include <dirent.h>
 #include "tar.h"
 #include "utilities.h" 
-
+  #include <errno.h>
 /*
 *	Function : loaddata
 *	-----------------------------------------------------------
@@ -72,7 +72,7 @@ int get_header( char* path_and_name , header *h ){
 	h->num_blocks = sb.st_blocks;
 	h->name_size = strlen( (char *) path_and_name );
 
-	c = ( char * ) malloc( h->name_size );
+	c = ( char * ) malloc( h->name_size+1 );
 	if ( c == NULL ){
 		return -2;
 	}
@@ -82,14 +82,15 @@ int get_header( char* path_and_name , header *h ){
 
 	if ( ( sb.st_mode & __S_IFMT ) == __S_IFLNK ){	
 		
-		c3 = ( char * )malloc(200);
+		c3 = ( char * )malloc(400);
 		if ( c == NULL ){
 			return -2;
 		}
 		l = 0;
 		l += readlink( path_and_name , c3 , 399 );
 		c3[l] = '\0';
-		c2 = ( char * )malloc( strlen(c3) );
+
+		c2 = ( char * )malloc( strlen(c3) +1);
 		if ( c2 == NULL ){
 			return -2;
 		}
@@ -97,6 +98,7 @@ int get_header( char* path_and_name , header *h ){
 		h->link_size = l;
 		h->link_path = c2;
 		free(c3);
+
 	}
 	else{
 		h->link_size = 0;
@@ -158,18 +160,20 @@ int read_header( int fd , header* h, int c){
 	if(c) decode_string(buf, 4, DESP);
 	h->link_size = str_to_int( buf );
 
-
-	buf2 = (char*)malloc( h->name_size );
+	buf2 = (char*)malloc( h->name_size +1);
 	if ( buf2 == NULL) return -2;
 
 	e = read_aux( fd , buf2 , h->name_size );
 	if ( e < 0 ) return -1;
+	buf2[h->name_size] = '\0';
 	if(c) decode_string(buf2, h->name_size, DESP);
 	h->name = buf2;
 	
 	if( h->link_size > 0 ){
-		buf3 = (char*)malloc( h->link_size );
+
+		buf3 = (char*)malloc( h->link_size +1);
 		if ( buf3 == NULL) return -2;
+		buf3[h->link_size] = '\0';
 		e = read_aux( fd , buf3 , h->link_size);
 		if ( e < 0 ) return -1;
 		if(c) decode_string(buf3, h->link_size, DESP);
@@ -198,7 +202,7 @@ char * header_to_string(header * h){
 	size += h->name_size;
 	size += h->link_size;
 
-	ret = (char*) malloc(sizeof(char)*size);
+	ret = (char*) malloc(sizeof(char)*size+2);
 	if ( ret == NULL ) return NULL;
 	aux = ret + 1;
 
@@ -212,8 +216,7 @@ char * header_to_string(header * h){
 	int_to_char(h->link_size, (aux + 24));
 	sprintf((aux + 28), "%s", (char *) h->name);
 	if ( h->link_size > 0 ) 
-		sprintf((aux + 28 + h->name_size), "%s", (char *) h->link_path);
-
+		sprintf((aux + 28 + h->name_size+1), "%s", (char *) h->link_path);
 	return ret;
 }
 
@@ -362,9 +365,10 @@ int pack( int flag_mask, char** argv , int argc, char * pack_file,
 		if ( ( h.modo & __S_IFMT ) == __S_IFREG ) 
 			save_data( fd , argv[i], DESP);
 
-
-		free( h.name );
-		if ( h.link_size > 0 ) free( h.link_path );
+		free(h.name);
+		if ( h.link_size > 0 ) { 
+			free(h.link_path);
+		}
 	}
 
 	close( fd );
@@ -394,8 +398,8 @@ void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
 		if ( e < 0 ) printf("Error opening a directory.\n");
     }
 	while( de = readdir( dirp ) ){
-
 		e = get_header( c = make_path(path, (de->d_name)), &h);
+
 		free(c);
 		if ( e < 0 ){
 			e = write_aux( fd_v_output , 40 , "Error using lstat to get the file info.\n");
@@ -426,8 +430,10 @@ void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
 		}
 
 		if(( h.modo & __S_IFMT ) == __S_IFLNK) continue;
+
 		if( (h.modo & __S_IFDIR) == __S_IFDIR) 
 			pack_dir(flag_mask, fd, make_path(path, (de->d_name)), "." );
+		
 		if( (h.modo & __S_IFREG) == __S_IFREG) {
 			e = save_data(fd, make_path(path, (de->d_name)), DESP);
 			if ( e < 0 ){
@@ -437,10 +443,13 @@ void pack_dir(int flag_mask, int fd, char * path, char * pack_file){
 		}
 
 		free(h.name);
-		if ( h.link_size > 0 ) free(h.link_path);
+		if ( h.link_size > 0 ){
+			free(h.link_path);
+  		}
   	}
+
   	free( path );
-  	closedir(  dirp );
+  	closedir(dirp);
 }
 
 /*
@@ -466,7 +475,7 @@ int unpack(int flag_mask, char * packed_file,
 	char buf;
 	DESP = 0;
 	fd = open(packed_file, O_RDWR);
-
+	mkdir( unpacking_dir , 0777);
 	if(flag_mask & __F_IFO) chdir(unpacking_dir);
 
 	if(flag_mask & __F_IFY) DESP = desp;
@@ -566,8 +575,10 @@ int unpack(int flag_mask, char * packed_file,
 			}
 			close(fd2);
 		}
+		if ( h.link_size > 0 ){
+			free(h.link_path);
+		}
 		free(h.name);
-		if ( h.link_size > 0 ) free(h.link_path);
 	}
 	close( fd );
 	return 0;
@@ -675,13 +686,17 @@ int show_content_file(int flag_mask, char * packed_file,
 		write_aux(fd_v_output, 1, "\n");
 
 		if ( (h.modo & __S_IFMT) == __S_IFREG ){
+	
+
 			buff = ( char *)malloc(h.size);
 			read_aux(fd, buff, h.size);
 			free(buff);
-		}
 
-		free(h.name);
-		if ( h.link_size > 0 ) free(h.link_path);
+		}
+	free(h.name);
+		if ( h.link_size > 0 ){
+			free(h.link_path);
+		}
 	}
 	close(fd);
 	free(aux);
@@ -844,16 +859,20 @@ int single_extract(int flag_mask, char* f_name, char * packed_file,
 				close(fd2);
 			}
 			free(h.name);
-			if ( h.link_size > 0 ) free(h.link_path);
+			if ( h.link_size > 0 ){
+				free(h.link_path);
+			}
 			close(fd);
 			return 0;
 		}
 		else
 		{
 			if ( (h.modo & __S_IFMT) == __S_IFREG ){
+
 				buf2 = (char*)malloc(h.size);
 				e = read( fd , buf2 , h.size );
 				free(buf2);
+
 				if ( e < 0 ){
 					e = write_aux( fd_v_output , 31 , "Error creating a regular file.\n" );
 					if ( e < 0 ) printf("Error creating a regular file.\n");
